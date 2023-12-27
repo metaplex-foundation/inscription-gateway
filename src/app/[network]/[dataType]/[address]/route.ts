@@ -16,9 +16,9 @@ function clusterApiUrl(cluster: string): string {
   }
 }
 
-export async function GET(request: Request, { params }: { params: { network: string, dataType: string, address: string } }) {
+export async function GET(request: Request, { params }: { params: { network: string, dataType: string, address: string }}) {
   const { network, dataType, address } = params
-  let res = new NextResponse();
+  // let res = new NextResponse();
 
   const umi = createUmi(clusterApiUrl(network), 'confirmed');
 
@@ -35,6 +35,18 @@ export async function GET(request: Request, { params }: { params: { network: str
         console.log(e);
         return NextResponse.error();
       }
+    } else if (dataType === 'image') {
+      console.log(request.url);
+      const searchParams = new URLSearchParams(request.url.split('?')[1]);
+      const imageData = Buffer.from(account.data);
+      // console.log(searchParams);
+      if (searchParams.get('ext') === 'png') {
+        let res = new NextResponse(imageData);
+        res.headers.set('Content-Type', 'image/png');
+        return res;
+      }
+
+      return NextResponse.json({});
     }
   } else {
     return NextResponse.error();
